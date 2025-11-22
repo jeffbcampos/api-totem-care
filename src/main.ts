@@ -48,6 +48,7 @@ async function bootstrap() {
     .setTitle('Totem Care API')
     .setDescription('Sistema de gerenciamento de atendimento de emergência baseado no Protocolo de Manchester')
     .setVersion('1.0')
+    .addTag('health', 'Health checks e status da aplicação')
     .addTag('pacientes', 'Operações relacionadas a pacientes')
     .addTag('atendimentos', 'Operações relacionadas a atendimentos')
     .addTag('sintomas', 'Operações relacionadas a sintomas para triagem')
