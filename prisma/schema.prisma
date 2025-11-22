@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Paciente {
+  id             String         @id @default(uuid())
+  cpf            String         @unique @db.VarChar(11)
+  nome           String
+  dataNascimento DateTime
+  telefone       String?
+  endereco       String?
+  email          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  atendimentos   Atendimento[]
+
+  @@index([cpf])
+  @@map("pacientes")
+}
+
+model Atendimento {
+  id                String                @id @default(uuid())
+  pacienteId        String
+  tipoAtendimento   String                @default("emergencia")
+  senha             String                @unique
+  temperatura       Float
+  pressaoSistolica  Int
+  pressaoDiastolica Int
+  peso              Float
+  nivelPrioridade   Int
+  corPulseira       String
+  dataHora          DateTime              @default(now())
+  status            String                @default("aguardando")
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  paciente          Paciente              @relation(fields: [pacienteId], references: [id])
+  sintomas          AtendimentoSintoma[]
+
+  @@index([dataHora])
+  @@index([pacienteId])
+  @@map("atendimentos")
+}
+
+model Sintoma {
+  id                  String                @id @default(uuid())
+  nome                String                @unique
+  descricao           String
+  categoria           String                // Respiratório, Cardiovascular, Neurológico, etc.
+  nivelGravidadeBase  Int                   // 1-5 (1=Emergente, 5=Não Urgente)
+  ativo               Boolean               @default(true)
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  atendimentos        AtendimentoSintoma[]
+
+  @@index([categoria])
+  @@index([nivelGravidadeBase])
+  @@map("sintomas")
+}
+
+model AtendimentoSintoma {
+  id             String      @id @default(uuid())
+  atendimentoId  String
+  sintomaId      String
+  intensidade    String      // leve, moderada, grave, muito_grave
+  observacoes    String?
+  createdAt      DateTime    @default(now())
+  atendimento    Atendimento @relation(fields: [atendimentoId], references: [id], onDelete: Cascade)
+  sintoma        Sintoma     @relation(fields: [sintomaId], references: [id])
+
+  @@unique([atendimentoId, sintomaId])
+  @@index([atendimentoId])
+  @@index([sintomaId])
+  @@map("atendimentos_sintomas")
+}
